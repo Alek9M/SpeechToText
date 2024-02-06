@@ -4,18 +4,29 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5aab296d-47db-4b54-95a9-88cce23e7752" name="Changes" comment="MVP" />
+    <list default="true" id="5aab296d-47db-4b54-95a9-88cce23e7752" name="Changes" comment="MVP">
+      <change afterPath="$PROJECT_DIR$/TextProcessor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 8
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
   <component name="ProjectId" id="2ag7eU36j2KlGBgqeMGb83tRxSs" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -28,14 +39,21 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "main",
+    "last_opened_file_path": "/Users/m/PycharmProjects/SpeechToText",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="TextToSpeech" />
@@ -76,7 +94,21 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1704728463595</updated>
-      <workItem from="1704728466190" duration="2595000" />
+      <workItem from="1704728466190" duration="33171000" />
+      <workItem from="1705234493702" duration="5415000" />
+      <workItem from="1705322036508" duration="2827000" />
+      <workItem from="1705501673315" duration="4000" />
+      <workItem from="1705502310966" duration="97000" />
+      <workItem from="1705505189867" duration="661000" />
+      <workItem from="1705592711259" duration="3890000" />
+      <workItem from="1705918989447" duration="10301000" />
+      <workItem from="1705940483497" duration="2831000" />
+      <workItem from="1705954020204" duration="593000" />
+      <workItem from="1706106893681" duration="2037000" />
+      <workItem from="1706223079953" duration="29000" />
+      <workItem from="1706710725680" duration="884000" />
+      <workItem from="1707163363568" duration="1000" />
+      <workItem from="1707238591500" duration="162000" />
     </task>
     <task id="LOCAL-00001" summary="MVP">
       <option name="closed" value="true" />
@@ -94,7 +126,15 @@
       <option name="project" value="LOCAL" />
       <updated>1704733101768</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="MVP">
+      <option name="closed" value="true" />
+      <created>1704733116919</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1704733116919</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -109,28 +149,38 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/main.py</url>
-          <line>48</line>
-          <option name="timeStamp" value="2" />
+          <line>128</line>
+          <option name="timeStamp" value="34" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/main.py</url>
-          <line>40</line>
-          <option name="timeStamp" value="3" />
+          <line>204</line>
+          <option name="timeStamp" value="36" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/AudioFile.py</url>
+          <line>79</line>
+          <option name="timeStamp" value="38" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/AudioFile.py</url>
+          <line>78</line>
+          <option name="timeStamp" value="39" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/main.py</url>
-          <line>42</line>
-          <option name="timeStamp" value="4" />
+          <line>190</line>
+          <option name="timeStamp" value="41" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/main.py</url>
-          <line>43</line>
-          <option name="timeStamp" value="5" />
+          <line>194</line>
+          <option name="timeStamp" value="42" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/TextToSpeech$main.coverage" NAME="main Coverage Results" MODIFIED="1704732899663" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/TextToSpeech$main.coverage" NAME="main Coverage Results" MODIFIED="1706107071611" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
