@@ -1,5 +1,6 @@
 import math
 import tiktoken
+import os
 
 
 class TextProcessor:
@@ -43,6 +44,20 @@ class TextProcessor:
 
         # Return the minimum of the next index and the last index
         return min(next_index + 1, last_index)
+
+    @staticmethod
+    def text_file_path_for(audio_file_path):
+        # Extract the directory and filename from the provided file path
+        directory, filename = os.path.split(audio_file_path)
+
+        # Create the new file path with the same filename but in the same directory
+        return os.path.join(directory, f"{os.path.splitext(filename)[0]}.txt")
+
+    @staticmethod
+    def text_to_file_in_same_folder(audio_file_path, text):
+        # Write the text to the new file
+        with open(TextProcessor.text_file_path_for(audio_file_path), 'w') as file:
+            file.write(text)
 
     def split_into_under(self, limit):
         piece_limit = (limit / 2) * 1000

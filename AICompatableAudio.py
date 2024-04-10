@@ -3,25 +3,53 @@ import os
 from pydub import AudioSegment
 import shutil
 
+from file_helpers import filename_at_path
 
-class AudioFile:
+
+class Piece:
+    def __init__(self, path: str, audio: AudioSegment):
+        self.path = path
+        self.audio = audio
+
+class AICompatableAudio:
+
+    @staticmethod
+    def is_mp3(file_path):
+        path, file_extension = os.path.splitext(file_path)
+        if file_extension == ".mp3":
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def get_audio_piece(audio, start_point, end_point):
+        return audio[start_point:end_point]
+
+    @staticmethod
+    def convert_hh_mm_ss_to_audio_point(input_time):
+        hours, minutes, seconds = input_time.split(':')
+        return ((int(hours) * 3600) + (int(minutes) * 60) + int(seconds)) * 1000
 
     def __init__(self, path: str):
         self._converted_audio = None
         self._converted_audio_path = None
         self.audio_pieces = []
         self.audio_pieces_paths = []
-        if os.path.isfile(path):
-            self._path = path
-            if not self.is_file_name_same_as_folder():
-                self.move_file_to_folder()
-            self.convert_to_mp3()
-            if not self.is_file_under_25mb():
-                self.split_audio()
-            else:
-                self.audio_pieces = [self._converted_audio]
-                self.audio_pieces_paths = [self._converted_audio_path]
-            # self._file = open(path, "rb")
+
+        self._path = path
+
+        self.prepare_for_processing()
+
+    def prepare_for_processing(self):
+        if not self.is_file_name_same_as_folder():
+            self.move_file_to_folder()
+        self.convert_to_mp3()
+        if not self.is_file_under_25mb():
+            self.split_audio()
+        else:
+            self.audio_pieces = [self._converted_audio]
+            self.audio_pieces_paths = [self._converted_audio_path]
+        # self._file = open(path, "rb")
 
     def is_file_under_25mb(self):
         if os.path.isfile(self._converted_audio_path):
@@ -62,22 +90,13 @@ class AudioFile:
                 end_point = min(self._converted_audio.duration_seconds * 1000, (i + 1) * piece_duration + overlap)
 
                 # Extract the audio piece with overlap
-                audio_piece = AudioFile.get_audio_piece(self._converted_audio, start_point, end_point)
+                audio_piece = AICompatableAudio.get_audio_piece(self._converted_audio, start_point, end_point)
 
                 audio_piece.export(piece_path, format="mp3")
 
                 # Append the audio piece to the list
                 self.audio_pieces.append(audio_piece)
             self.audio_pieces_paths.append(piece_path)
-
-    @staticmethod
-    def get_audio_piece(audio, start_point, end_point):
-        return audio[start_point:end_point]
-
-    @staticmethod
-    def convert_hh_mm_ss_to_audio_point(input_time):
-        hours, minutes, seconds = input_time.split(':')
-        return ((int(hours) * 3600) + (int(minutes) * 60) + int(seconds)) * 1000
 
     def is_file_name_same_as_folder(self):
         # Extract the filename and directory name
@@ -108,28 +127,36 @@ class AudioFile:
 
     @staticmethod
     def audio_from_mp3(file_path):
-        if AudioFile.is_mp3(file_path):
+        if AICompatableAudio.is_mp3(file_path):
             return AudioSegment.from_mp3(file_path)
 
     @staticmethod
-    def is_mp3(file_path):
-        file_path, file_extension = os.path.splitext(file_path)
-        if file_extension == ".mp3": return True
-        else: return False
+    def audio_from_file(file_path):
+        if AICompatableAudio.is_mp3(file_path):
+            path, file_extension = os.path.splitext(file_path)
+            return AudioSegment.from_file(file_path, format=file_extension[1:])
+
+    def convert(self, filename: str, from_format: str, to_format: str) -> str:
+        raw_audio = AudioSegment.from_file(f"{filename}.{from_format}", format=from_format)
+        raw_audio.export(f"{filename}.{to_format}", format=to_format)
+        return f"{filename}.{to_format}"
 
     def convert_to_mp3(self):
-        if os.path.isfile(self._path):
-            # Extract the file extension
-            file_path, file_extension = os.path.splitext(self._path)
+        file_path, file_extension = os.path.splitext(self._path)
+        desired_format = "mp3"
+        desired_extension = "." + desired_format
+        needs_conversion = file_extension != desired_extension
+        if needs_conversion:
             if file_extension == ".ogg":
-                self._converted_audio_path = file_path + ".mp3"
+                self._converted_audio_path = file_path + desired_extension
                 if not os.path.exists(self._converted_audio_path):
                     song = AudioSegment.from_ogg(self._path)
-                    song.export(self._converted_audio_path, format="mp3")
-                print( f"opening {self._converted_audio_path}")
-                self._converted_audio = AudioFile.audio_from_mp3(self._converted_audio_path)
-            elif file_extension == ".mp3":
-                self._converted_audio = AudioFile.audio_from_mp3(self._path)
-                self._converted_audio_path = self._path
+                    song.export(self._converted_audio_path, format=desired_format)
             else:
-                raise IOError(f'File extension {file_extension} not supported')
+                self._converted_audio_path = self.convert(filename_at_path(file_path), file_extension, desired_format)
+            self._converted_audio = AICompatableAudio.audio_from_mp3(self._converted_audio_path)
+        else:
+            self._converted_audio = AICompatableAudio.audio_from_mp3(self._path)
+            self._converted_audio_path = self._path
+
+
