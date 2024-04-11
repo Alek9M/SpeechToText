@@ -27,7 +27,14 @@ class AICompatableAudio:
 
     @staticmethod
     def convert_hh_mm_ss_to_audio_point(input_time):
-        hours, minutes, seconds = input_time.split(':')
+        components = input_time.split(':')
+        hours, minutes, seconds = (0, 0, 0)
+        if len(components) == 3:
+            hours, minutes, seconds = components
+        elif len(components) == 2:
+            minutes, seconds = components
+        elif len(components) == 1:
+            seconds = components[0]
         return ((int(hours) * 3600) + (int(minutes) * 60) + int(seconds)) * 1000
 
     def __init__(self, path: str):
@@ -132,9 +139,8 @@ class AICompatableAudio:
 
     @staticmethod
     def audio_from_file(file_path):
-        if AICompatableAudio.is_mp3(file_path):
-            path, file_extension = os.path.splitext(file_path)
-            return AudioSegment.from_file(file_path, format=file_extension[1:])
+        path, file_extension = os.path.splitext(file_path)
+        return AudioSegment.from_file(file_path, format=file_extension[1:])
 
     def convert(self, filename: str, from_format: str, to_format: str) -> str:
         raw_audio = AudioSegment.from_file(f"{filename}.{from_format}", format=from_format)

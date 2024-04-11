@@ -36,7 +36,7 @@ class TextProcessor:
         sentence_endings = set('.!?')
 
         # Find the next occurrence of '.', '!', or '?' after the current index
-        next_index = min((input_string.find(char, current_index) for char in sentence_endings if char in input_string),
+        next_index = min((val for val in (input_string.find(char, current_index) for char in set('.!?') if char in input_string) if val != -1),
                          default=-1)
 
         # Find the last index of the string
@@ -68,7 +68,10 @@ class TextProcessor:
         last_end = -1
         for i in range(num_pieces):
             start_point = max(last_end, i * piece_duration)
-            end_point = TextProcessor.find_next_sentence_index(whole, min(len(whole) - 1, (i + 1) * piece_duration))
+            end = min(len(whole) - 1, (i + 1) * piece_duration)
+            end_point = TextProcessor.find_next_sentence_index(whole, end)
+            if start_point >= end_point:
+                end_point = end
             parts.append(whole[start_point:end_point])
             last_end = end_point
 

@@ -14,7 +14,7 @@ client = openai  # openai(api_key="")
 aud = None
 
 
-def process_audio(file_path, locally=False):
+def process_audio(file_path, choice, locally=False):
     text_processor = TextProcessor()
     audio = AICompatableAudio(file_path)
 
@@ -23,81 +23,96 @@ def process_audio(file_path, locally=False):
         text_processor.add_path(new_text_file_path)
 
         if not os.path.exists(new_text_file_path):
-            with open(path, "rb") as audio_file:
-                print(f"transcribing {audio_file}")
-                transcript = ""
-                if locally:
-                    model_name = "large"
-                    start_model = timeit.default_timer()
-                    model = whisper.load_model(model_name)  # the point
-                    loaded_model = timeit.default_timer()
-                    print("Loaded", model_name, "in", loaded_model - start_model)
+            print(f"transcribing {path}")
+            transcript = ""
+            if locally:
+                model_name = "large"
+                start_model = timeit.default_timer()
+                model = whisper.load_model(model_name)  # the point
+                loaded_model = timeit.default_timer()
+                print("Loaded", model_name, "in", loaded_model - start_model)
 
-                    start_transcribing = timeit.default_timer()
-                    result = model.transcribe(file_path)  # the point
-                    end_transcribing = timeit.default_timer()
-                    print("Transcribed by", model_name, "in", end_transcribing - start_transcribing)
+                start_transcribing = timeit.default_timer()
+                result = model.transcribe(path)  # the point
+                end_transcribing = timeit.default_timer()
+                print("Transcribed by", model_name, "in", end_transcribing - start_transcribing)
 
-                    transcript = result["text"]
-                    # file_path, file_extension = os.path.splitext(file_path)
-                    # with open(file_path + " local by " + model_name + ".txt", "w") as local:
-                    #     local.write(result["text"])
-                else:
-                    transcript = client.audio.transcriptions.create(
+                transcript = result["text"]
+                # file_path, file_extension = os.path.splitext(file_path)
+                # with open(file_path + " local by " + model_name + ".txt", "w") as local:
+                #     local.write(result["text"])
+            else:
+                with open(path, "rb") as audio_file:
+                    transcript = client.Audio.transcriptions.create(
                         model="whisper-1",
                         file=audio_file,
-                        prompt=conference_whisper_prompt
+                        prompt=Buttons.whisper(choice)
                     )
                     transcript = transcript.text
 
             if len(transcript) > 0:
                 TextProcessor.text_to_file_in_same_folder(path, transcript)
 
-    process_text(audio, text_processor)
+    process_text(audio, text_processor, choice)
 
     # progress_window.close()
 
 
-def process_text(audio: AICompatableAudio, text_processor: TextProcessor):
+def process_text(audio: AICompatableAudio, text_processor: TextProcessor, choice):
     i = -1
     for text in text_processor.split_into_under(7):
-        tokens = len(TextProcessor.tokenize(text))
-        if tokens == 0:
-            break
         i += 1
-        print(f"Tokens: {tokens}")
-        if os.path.exists(text_file_path(audio._converted_audio_path, i)):
-            continue
+        process_raw(text, audio._converted_audio_path, choice, i)
 
-        with open(pretext_file_path(audio._converted_audio_path, i), "w") as full:
-            full.write(text)
 
-        response = client.chat.completions.create(
-            model="gpt-4",
-            temperature=0.2,
-            messages=[
-                {"role": "system",
-                 "content": monologue_gpt_prompt},
-                {"role": "user",
-                 "content": text}
-            ]
-        )
+def process_raw(text: str, origin_path: str, choice, i=""):
+    tokens = len(TextProcessor.tokenize(text))
+    if tokens == 0:
+        return
+    print(f"Tokens: {tokens}")
+    desired_file = text_file_path(origin_path, i)
+    if os.path.exists(desired_file):
+        raise ValueError("File already exists")
 
-        with open(text_file_path(audio._converted_audio_path, i), "w") as full:
-            if response.choices[0].finish_reason == 'stop':
-                full.write(response.choices[0].message.content)
+    with open(pretext_file_path(origin_path, i), "w") as full:
+        full.write(text)
+
+    response = client.ChatCompletion.create(
+        model="gpt-4",
+        temperature=0.2,
+        messages=[
+            {"role": "system",
+             "content": Buttons.gpt(choice)},
+            {"role": "user",
+             "content": text}
+        ]
+    )
+    if response.choices[0].finish_reason == 'stop':
+        with open(desired_file, "w") as full:
+            full.write(response.choices[0].message.content)
+    else:
+        raise ValueError("Incorrect OpenAI finish reason")
 
 
 # enum for buttons
 
-def process(file_path):
+def process(file_path, choice):
     print("Processing")
-    process_text()
+    text = ""
+    with open(file_path, "r") as orig:
+        text = orig.read()
+    if len(text) > 0:
+        processor = TextProcessor()
+        processor.add_path(file_path)
+        i = -1
+        for text_part in processor.split_into_under(7):
+            i += 1
+            process_raw(text_part, file_path, choice, i)
 
 
 def cut(file_path, values):
-    starting_point = AICompatableAudio.convert_hh_mm_ss_to_audio_point(values[1])
-    finishing_point = AICompatableAudio.convert_hh_mm_ss_to_audio_point(values[2])
+    starting_point = AICompatableAudio.convert_hh_mm_ss_to_audio_point(values[0])
+    finishing_point = AICompatableAudio.convert_hh_mm_ss_to_audio_point(values[1])
     audio = None
     if AICompatableAudio.is_mp3(file_path):
         audio = AICompatableAudio.audio_from_mp3(file_path)
@@ -107,7 +122,7 @@ def cut(file_path, values):
 
     a_cut = AICompatableAudio.get_audio_piece(audio, starting_point, finishing_point)
     file_path, file_extension = os.path.splitext(file_path)
-    a_cut.export(file_path + " from " + values[1] + " to " + values[2] + file_extension, format='mp3')
+    a_cut.export(file_path + " from " + values[0] + " to " + values[1] + ".mp3", format='mp3')
 
 
 # def local_trans(file_path):
@@ -128,17 +143,33 @@ def cut(file_path, values):
 
 class Buttons(Enum):
     PROCESS = "Process text"
-    TRANSCRIPT = "Transcript online"
-    LOCAL = "Transcript locally"
+    TRANSCRIPT = "Transcribe online"
+    LOCAL = "Transcribe locally"
     CUT = "Cut out a piece"
+    LIST_PODCAST = "Podcast"
+    LIST_CONFERENCE = "Conference"
+
+    @staticmethod
+    def whisper(choice):
+        if choice[0] == Buttons.LIST_PODCAST.value:
+            return podcast_prompt
+        else:
+            return conference_whisper_prompt
+
+    @staticmethod
+    def gpt(choice):
+        if choice[0] == Buttons.LIST_PODCAST.value:
+            return monologue_gpt_prompt
+        else:
+            return dialogue_gpt_prompt
 
 
 FILE_PATH_KEY = "file_path"
-TEXT_FILE_PATH_KEY = "file_path"
+TEXT_FILE_PATH_KEY = "file_path0"
 
 
-def get_file_path_from(values) -> str:
-    path = values[FILE_PATH_KEY]
+def get_file_path_from(values, key=FILE_PATH_KEY) -> str:
+    path = values[key]
     if os.path.isfile(path):
         return path
     else:
@@ -155,12 +186,12 @@ def event_loop():
                 break
 
             if event == Buttons.PROCESS.value:
-                process(get_file_path_from(values))
+                process(get_file_path_from(values, TEXT_FILE_PATH_KEY), values[2])
             elif event == Buttons.TRANSCRIPT.value:
-                process_audio(get_file_path_from(values))
+                process_audio(get_file_path_from(values), values[2])
             elif event == Buttons.LOCAL.value:
                 # local_trans(get_file_path_from(values))
-                process_audio(get_file_path_from(values), True)
+                process_audio(get_file_path_from(values), values[2], True)
             elif event == Buttons.CUT.value:
                 cut(get_file_path_from(values), values)
 
@@ -176,7 +207,8 @@ if __name__ == '__main__':
         [sg.Button(Buttons.TRANSCRIPT.value), sg.Button(Buttons.LOCAL.value)],
         [sg.Text('From:'), sg.Input(size=(8, 1)), sg.Text('To:'), sg.Input(size=(8, 1)), sg.Button(Buttons.CUT.value)],
         [sg.Text('Text file '), sg.InputText(key=TEXT_FILE_PATH_KEY, size=(40, 1)), sg.FileBrowse()],
-        [sg.Button(Buttons.PROCESS.value)],
+        [sg.Button(Buttons.PROCESS.value),
+         sg.Listbox([Buttons.LIST_PODCAST.value, Buttons.LIST_CONFERENCE.value], size=(10, 2))],
     ]
     # , sg.Button('Process')
 
