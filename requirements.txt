@@ -1,0 +1,6 @@
+openai==1.16.2
+openai_whisper==20231117
+pydub==0.25.1
+PySimpleGUI==5.0.4
+python-dotenv==1.0.1
+tiktoken==0.6.0
