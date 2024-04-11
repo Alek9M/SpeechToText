@@ -53,19 +53,51 @@ def process_audio(file_path, choice, locally=False):
             if len(transcript) > 0:
                 TextProcessor.text_to_file_in_same_folder(path, transcript)
 
-    process_text(audio, text_processor, choice)
+    # TODO: uncomment?
+    # process_text(audio, text_processor, choice)
 
     # progress_window.close()
 
 
-def process_text(audio: AICompatableAudio, text_processor: TextProcessor, choice):
-    i = -1
-    for text in text_processor.split_into_under(7):
-        i += 1
-        process_raw(text, audio._converted_audio_path, choice, i)
+# def process_text(audio: AICompatableAudio, text_processor: TextProcessor, choice):
+#     i = -1
+#     for text in text_processor.split_into_under(7):
+#         i += 1
+#         process_raw(text, audio._converted_audio_path, choice, i)
 
+def generate_post_for(text: str, n=1) -> str:
+    response = client.ChatCompletion.create(
+        model="gpt-4-turbo",
+        temperature=1.15,
+        max_tokens=1000 * n,
+        n=n,
+        messages=[
+            {"role": "system",
+             "content": instagram_post_prompt},
+            {"role": "user",
+             "content": text}
+        ]
+    )
+    return response.choices
 
-def process_raw(text: str, origin_path: str, choice, i=""):
+def create_posts(file_path, n):
+    text = ""
+    if n > 5 or n < 0:
+        raise ValueError("n must be between 0 and 5")
+    with open(file_path, "r") as orig:
+        text = orig.read()
+    if len(text) > 0:
+        processor = TextProcessor()
+        processor.add_path(file_path)
+        choices = generate_post_for(processor.whole_text, n)
+        for choice in choices:
+            if choice.finish_reason == 'stop':
+                directory, filename = os.path.split(file_path)
+                post_path = os.path.join(directory, f"post {choices.index(choice)}.txt")
+                with open(post_path, "w") as post:
+                    post.write(choice.message.content)
+
+def process_raw(text: str, origin_path: str, choice, model, context_window, i="") -> str:
     tokens = len(TextProcessor.tokenize(text))
     if tokens == 0:
         return
@@ -78,7 +110,7 @@ def process_raw(text: str, origin_path: str, choice, i=""):
         full.write(text)
 
     response = client.ChatCompletion.create(
-        model="gpt-4",
+        model=model,
         temperature=0.2,
         messages=[
             {"role": "system",
@@ -90,13 +122,14 @@ def process_raw(text: str, origin_path: str, choice, i=""):
     if response.choices[0].finish_reason == 'stop':
         with open(desired_file, "w") as full:
             full.write(response.choices[0].message.content)
+            return response.choices[0].message.content
     else:
         raise ValueError("Incorrect OpenAI finish reason")
 
 
 # enum for buttons
 
-def process(file_path, choice):
+def process(file_path, choice, model="gpt-4", context_window=7):
     print("Processing")
     text = ""
     with open(file_path, "r") as orig:
@@ -105,9 +138,9 @@ def process(file_path, choice):
         processor = TextProcessor()
         processor.add_path(file_path)
         i = -1
-        for text_part in processor.split_into_under(7):
+        for text_part in processor.split_into_under(context_window):
             i += 1
-            process_raw(text_part, file_path, choice, i)
+            process_raw(text_part, file_path, choice, model, context_window, i)
 
 
 def cut(file_path, values):
@@ -146,8 +179,10 @@ class Buttons(Enum):
     TRANSCRIPT = "Transcribe online"
     LOCAL = "Transcribe locally"
     CUT = "Cut out a piece"
+    POST = "Generate Instagram posts"
     LIST_PODCAST = "Podcast"
     LIST_CONFERENCE = "Conference"
+    CHEAP = "Process text cheaply"
 
     @staticmethod
     def whisper(choice):
@@ -166,7 +201,6 @@ class Buttons(Enum):
 
 FILE_PATH_KEY = "file_path"
 TEXT_FILE_PATH_KEY = "file_path0"
-
 
 def get_file_path_from(values, key=FILE_PATH_KEY) -> str:
     path = values[key]
@@ -187,6 +221,10 @@ def event_loop():
 
             if event == Buttons.PROCESS.value:
                 process(get_file_path_from(values, TEXT_FILE_PATH_KEY), values[2])
+            elif event == Buttons.CHEAP.value:
+                process(get_file_path_from(values, TEXT_FILE_PATH_KEY), values[2], "gpt-3.5-turbo", 16)
+            elif event == Buttons.POST.value:
+                create_posts(get_file_path_from(values, TEXT_FILE_PATH_KEY), int(values[3]))
             elif event == Buttons.TRANSCRIPT.value:
                 process_audio(get_file_path_from(values), values[2])
             elif event == Buttons.LOCAL.value:
@@ -201,14 +239,15 @@ def event_loop():
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    sg.theme('DarkAmber')
+    sg.theme('DarkPurple')
     layout = [
         [sg.Text('Audio file'), sg.InputText(key=FILE_PATH_KEY, size=(40, 1)), sg.FileBrowse()],
         [sg.Button(Buttons.TRANSCRIPT.value), sg.Button(Buttons.LOCAL.value)],
         [sg.Text('From:'), sg.Input(size=(8, 1)), sg.Text('To:'), sg.Input(size=(8, 1)), sg.Button(Buttons.CUT.value)],
         [sg.Text('Text file '), sg.InputText(key=TEXT_FILE_PATH_KEY, size=(40, 1)), sg.FileBrowse()],
-        [sg.Button(Buttons.PROCESS.value),
-         sg.Listbox([Buttons.LIST_PODCAST.value, Buttons.LIST_CONFERENCE.value], size=(10, 2))],
+        [sg.Button(Buttons.PROCESS.value), sg.Button(Buttons.CHEAP.value),
+         sg.Listbox([Buttons.LIST_PODCAST.value, Buttons.LIST_CONFERENCE.value], size=(10, 2)),
+         sg.Button(Buttons.POST.value), sg.Input(default_text='2', size=(1,1))],
     ]
     # , sg.Button('Process')
 
