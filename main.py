@@ -132,15 +132,22 @@ def process_raw(text: str, origin_path: str, choice, model, context_window, i=""
 def process(file_path, choice, model="gpt-4", context_window=7):
     print("Processing")
     text = ""
+    processed_text = ""
     with open(file_path, "r") as orig:
         text = orig.read()
-    if len(text) > 0:
-        processor = TextProcessor()
-        processor.add_path(file_path)
-        i = -1
-        for text_part in processor.split_into_under(context_window):
-            i += 1
-            process_raw(text_part, file_path, choice, model, context_window, i)
+    if len(text) == 0:
+        raise ValueError("File is empty")
+
+    processor = TextProcessor()
+    processor.add_path(file_path)
+    i = -1
+    for text_part in processor.split_into_under(context_window):
+        i += 1
+        processed_text += process_raw(text_part, file_path, choice, model, context_window, i) + "\n"
+    directory, filename, extension = file_breakdown(file_path)
+    with open(os.path.join(directory, f"{filename}_processed_whole.txt"), "w") as processed:
+        processed.write(processed_text)
+
 
 
 def cut(file_path, values):
@@ -155,6 +162,8 @@ def cut(file_path, values):
 
     a_cut = AICompatableAudio.get_audio_piece(audio, starting_point, finishing_point)
     file_path, file_extension = os.path.splitext(file_path)
+    # directory, filename, extension = file_breakdown(file_path)
+
     a_cut.export(file_path + " from " + values[0] + " to " + values[1] + ".mp3", format='mp3')
 
 
