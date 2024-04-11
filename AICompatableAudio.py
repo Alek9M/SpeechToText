@@ -143,7 +143,9 @@ class AICompatableAudio:
         return AudioSegment.from_file(file_path, format=file_extension[1:])
 
     def convert(self, filename: str, from_format: str, to_format: str) -> str:
-        raw_audio = AudioSegment.from_file(f"{filename}.{from_format}", format=from_format)
+        # from_format has .
+        # to_format doens't
+        raw_audio = AudioSegment.from_file(f"{filename}{from_format}", format=from_format[1:])
         raw_audio.export(f"{filename}.{to_format}", format=to_format)
         return f"{filename}.{to_format}"
 

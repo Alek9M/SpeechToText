@@ -43,11 +43,17 @@ def process_audio(file_path, choice, locally=False):
                 #     local.write(result["text"])
             else:
                 with open(path, "rb") as audio_file:
-                    transcript = client.Audio.transcriptions.create(
-                        model="whisper-1",
+                    start_transcribing = timeit.default_timer()
+                    transcript = client.Audio.transcribe(model="whisper-1",
                         file=audio_file,
-                        prompt=Buttons.whisper(choice)
-                    )
+                        prompt=Buttons.whisper(choice))
+                    end_transcribing = timeit.default_timer()
+                    print("Transcribed by OpenAI in", end_transcribing - start_transcribing)
+                    # transcript = client.Audio.transcriptions.create(
+                    #     model="whisper-1",
+                    #     file=audio_file,
+                    #     prompt=Buttons.whisper(choice)
+                    # )
                     transcript = transcript.text
 
             if len(transcript) > 0:
@@ -119,10 +125,13 @@ def process_raw(text: str, origin_path: str, choice, model, context_window, i=""
              "content": text}
         ]
     )
-    if response.choices[0].finish_reason == 'stop':
+    finish_reason = response.choices[0].finish_reason
+    if finish_reason == 'stop':
         with open(desired_file, "w") as full:
             full.write(response.choices[0].message.content)
             return response.choices[0].message.content
+    elif finish_reason == "length":
+        raise ValueError("Text too long")
     else:
         raise ValueError("Incorrect OpenAI finish reason")
 
@@ -195,6 +204,9 @@ class Buttons(Enum):
 
     @staticmethod
     def whisper(choice):
+        if len(choice) != 1:
+            raise ValueError("Specify type of audio")
+
         if choice[0] == Buttons.LIST_PODCAST.value:
             return podcast_prompt
         else:
@@ -231,7 +243,7 @@ def event_loop():
             if event == Buttons.PROCESS.value:
                 process(get_file_path_from(values, TEXT_FILE_PATH_KEY), values[2])
             elif event == Buttons.CHEAP.value:
-                process(get_file_path_from(values, TEXT_FILE_PATH_KEY), values[2], "gpt-3.5-turbo", 16)
+                process(get_file_path_from(values, TEXT_FILE_PATH_KEY), values[2], "gpt-3.5-turbo", 14)
             elif event == Buttons.POST.value:
                 create_posts(get_file_path_from(values, TEXT_FILE_PATH_KEY), int(values[3]))
             elif event == Buttons.TRANSCRIPT.value:
