@@ -1,3 +1,4 @@
+import ffmpeg
 import openai
 import PySimpleGUI as sg
 from file_helpers import *
@@ -8,6 +9,8 @@ from AICompatableAudio import AICompatableAudio
 from TextProcessor import TextProcessor
 from enum import Enum
 from dotenv import load_dotenv
+
+from pydub import AudioSegment
 
 openai.api_key = os.environ.get('OPENAI_KEY')
 client = openai  # openai(api_key="")
@@ -162,10 +165,17 @@ def process(file_path, choice, model="gpt-4", context_window=7):
 def cut(file_path, values):
     starting_point = AICompatableAudio.convert_hh_mm_ss_to_audio_point(values[0])
     finishing_point = AICompatableAudio.convert_hh_mm_ss_to_audio_point(values[1])
+
+    # audio_input = ffmpeg.input(file_path)
+    # audio_cut = audio_input.audio.filter('atrim', start=starting_point/1000, end=finishing_point/1000)
+    # audio_output = ffmpeg.output(audio_cut, file_path + 'test.mp3')
+    # ffmpeg.run(audio_output)
+
     audio = None
     if AICompatableAudio.is_mp3(file_path):
         audio = AICompatableAudio.audio_from_mp3(file_path)
     else:
+        # audio = AudioSegment.from_file(AICompatableAudio(file_path)._converted_audio_path)
         audio = AICompatableAudio.audio_from_file(file_path)
         # raise ValueError("Only supports mp3 files")
 
