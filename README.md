@@ -29,7 +29,7 @@ Tool for processing audio files and generating transcriptions or text-based cont
 python3.11 main.py
 ```
 
-![alt text](Screenshot.png)
+![screenshot](Screenshot.png)
 ### Transcribing Audio
 1. Choose an `Audio file`
 2. Select if audio is  a `Podcast` (monologue) or a `Conference` (group discussion)
