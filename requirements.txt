@@ -4,3 +4,5 @@ pydub==0.25.1
 PySimpleGUI==5.0.4
 python-dotenv==1.0.1
 tiktoken==0.6.0
+python-ffmpeg
+ffprobe-python

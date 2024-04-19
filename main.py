@@ -1,4 +1,4 @@
-import ffmpeg
+# import ffmpeg
 import openai
 import PySimpleGUI as sg
 from file_helpers import *

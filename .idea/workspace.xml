@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5aab296d-47db-4b54-95a9-88cce23e7752" name="Changes" comment="package requirements">
+    <list default="true" id="5aab296d-47db-4b54-95a9-88cce23e7752" name="Changes" comment="cut">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prompts.py" beforeDir="false" afterPath="$PROJECT_DIR$/prompts.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -144,7 +146,10 @@
       <workItem from="1712841349801" duration="3529000" />
       <workItem from="1712876254311" duration="1172000" />
       <workItem from="1713011295766" duration="2680000" />
-      <workItem from="1713095354998" duration="903000" />
+      <workItem from="1713095354998" duration="3167000" />
+      <workItem from="1713143649756" duration="59000" />
+      <workItem from="1713184627223" duration="1328000" />
+      <workItem from="1713557974909" duration="719000" />
     </task>
     <task id="LOCAL-00001" summary="MVP">
       <option name="closed" value="true" />
@@ -250,7 +255,15 @@
       <option name="project" value="LOCAL" />
       <updated>1712877169286</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="cut">
+      <option name="closed" value="true" />
+      <created>1713096394909</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1713096394909</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -282,7 +295,8 @@
     <MESSAGE value="combines processed" />
     <MESSAGE value="check" />
     <MESSAGE value="package requirements" />
-    <option name="LAST_COMMIT_MESSAGE" value="package requirements" />
+    <MESSAGE value="cut" />
+    <option name="LAST_COMMIT_MESSAGE" value="cut" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -355,6 +369,6 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/TextToSpeech$main.coverage" NAME="main Coverage Results" MODIFIED="1706107071611" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/SpeechToText$main.coverage" NAME="main Coverage Results" MODIFIED="1713096258093" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/SpeechToText$main.coverage" NAME="main Coverage Results" MODIFIED="1713184632159" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
